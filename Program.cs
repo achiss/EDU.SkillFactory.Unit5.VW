@@ -2,33 +2,21 @@
 // Refactoring from: https://github.com/achiss/Unut5_result.git 
 
  
-namespace Unit5.refactoring                                                                                             // Подчёркивается
+namespace Unit5.refactoring                                                                                             // Подчёркивается, почему?
 { 
-    class Program 
+    class Program
     {
-        static Tuple <string, string, int, bool,int, string, int, string> taskTupleData()
-        {
-            string Name = "";
-            string Surname = "";
-            int Age = 0;
-            bool isPet = false;
-            int petCount = 0;
-            string[] petList = new string[0];
-            int colorCount = 0;
-            string[] colorList = new string[0];
-
-            return Name, Surname, Age, isPet, petCount, petList, colorCount, colorList;
-        }
+        private static (string Name, string Surname, int Age, bool isPet, int petCount, string[] petList,
+            int colorCount, string[] colorList) userData;
         
         static void Main(string[] args)
         {
-            var userData = taskTupleData();
-            
-           GetUserDataFromConsole(out userData.Name,  out userData.Surname, out userData.Age);
-           PetUserData(ref userData.isPet, ref userData.petCount, ref userData.petList);
-           ColorUserData(ref userData.colorCount, ref userData.colorList);
+           GetUserDataFromConsole(out userData.Name, out userData.Surname, out userData.Age);                           // Пример: out
+           PetUserData(ref userData.isPet, ref userData.petCount, ref userData.petList);                                // Пример: ref
+           ColorUserData(ref userData.colorCount, ref userData.colorList);                                              //
            
-           ShowUserData(in userData);
+           ShowUserData(in (string Name, string Surname, int Age, bool isPet, int petCount, string[] petList,
+               int colorCount, string[] colorList) userData);
            
            Console.ReadKey(); 
         } 
@@ -102,28 +90,29 @@ namespace Unit5.refactoring                                                     
                 } 
             } 
         }
-         
+        
+        // Метод выводит сообщение об ошибке если введены не корректные значения
        static void ShowMessage() 
         { 
             Console.WriteLine("\t The data is not correct."); 
             Console.Write("\t Please, enter the data again: "); 
         }
 
-       static void GetUserDataFromConsole(out (string Name, string Surname, int Age) UserData)
+       static void GetUserDataFromConsole(out string userName, out string userSurname, out int userAge)
         { 
             Console.Write("\n"); 
              
             Console.Write("\t Input your name (only letters): "); 
-            UserData.Name = CharacterIdentification(); 
+            userName = CharacterIdentification(); 
              
             Console.Write("\t Input your surname (only letters): "); 
-            UserData.Surname = CharacterIdentification(); 
+            userSurname = CharacterIdentification(); 
              
             Console.Write("\t Input your full agе (only numbers): "); 
-            UserData.Age = CheckNumber(NumberIdentification());
+            userAge = CheckNumber(NumberIdentification());
         }
        
-       static void PetUserData(ref (bool isPet, int PetCount, string[] PetList) UserData)
+       static void PetUserData(ref bool userIsPet, ref int userPetCount, ref string[] userPetList)
        {
            Console.Write("\t Do yo have any pets (only letters, yes(y) or no(n): "); 
            
