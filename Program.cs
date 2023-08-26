@@ -6,7 +6,7 @@ namespace Unit5.refactoring                                                     
 { 
     class Program
     {
-        private static (string Name, string Surname, int Age, bool isPet, int petCount, string[] petList,
+        static (string Name, string Surname, int Age, bool isPet, int petCount, string[] petList,
             int colorCount, string[] colorList) userData;
         
         static void Main(string[] args)
@@ -15,8 +15,7 @@ namespace Unit5.refactoring                                                     
            PetUserData(ref userData.isPet, ref userData.petCount, ref userData.petList);                                // Пример: ref
            ColorUserData(ref userData.colorCount, ref userData.colorList);                                              //
            
-           ShowUserData(in (string Name, string Surname, int Age, bool isPet, int petCount, string[] petList,
-               int colorCount, string[] colorList) userData);
+           ShowUserData(in userData);                                                                                   // Пример: in
            
            Console.ReadKey(); 
         } 
@@ -119,14 +118,13 @@ namespace Unit5.refactoring                                                     
            
        }
        
-       static void ColorUserData(ref (int ColorCount, string[] ColorList) UserData)
+       static void ColorUserData(ref int userColorCount, ref string[] userColorList)
        {
            
        }
          
-       static void ShowUserData(in (string Name, string Surname, int Age, bool isPet, int PetCount, string[] PetList, 
-           int
-           ColorCount, string[] ColorList) UserData) 
+       static void ShowUserData(in (string Name, string Surname, int Age, bool isPet, int petCount, string[] petList,
+           int colorCount, string[] colorList) userData)
        {
        } 
     } 
