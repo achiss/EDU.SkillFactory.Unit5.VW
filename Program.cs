@@ -40,7 +40,7 @@ namespace Unit5.refactoring                                                     
             bool containSpecialChars = characterString.Any(char.IsLetterOrDigit);                                       // Необходимость текущих строк? 
             bool containNumbers = characterString.Any(char.IsDigit);                                                    //  
             
-           if ((containSpecialChars == false) && (containNumbers == true))                                              // Почему IDE не подсвечивает true? 
+           if ((containSpecialChars == false) || (containNumbers == true))                                              // Почему IDE не подсвечивает true? 
             { 
                 ShowMessage(); 
                 return CharacterIdentification(); 
@@ -50,7 +50,7 @@ namespace Unit5.refactoring                                                     
         } 
  
         //  Проверка полученных данных из консоли (проверка: введено число) 
-        static int NumberIdentification() 
+        static int NumberIdentification()
         { 
             string receivedData = GetDataFromConsole(); 
             int receivedNumber; 
@@ -111,21 +111,123 @@ namespace Unit5.refactoring                                                     
             userAge = CheckNumber(NumberIdentification());
         }
        
+       // Метод возвращает часть кортежа: есть ли домашние животные, их количество и кличка(и)
+       // CheckDataIsPetAnswer - проверяет введенное значечение с клавиатуры (userIsPet)
+       // NotCorrectDataToUserPetCount - если в первый раз введено не правильное значение (userPetCount)
+       // AddDataToTheUserPetList - добавляет имена питомцев в массив в соответствии с их количеством.
        static void PetUserData(ref bool userIsPet, ref int userPetCount, ref string[] userPetList)
        {
-           Console.Write("\t Do yo have any pets (only letters, yes(y) or no(n): "); 
+           Console.Write("\t Do yo have any pet(s) (only letters, Yes(y) or No(n): ");
+           userIsPet = CheckDataIsPetAnswer();
            
-           
+           if (userIsPet == true)
+           {
+               Console.Write("\t Input, how many pet's do you have (only numbers)?");
+               userPetCount = CheckNumber(NumberIdentification());
+               
+               AddDataToTheUserPetList(in userPetCount, ref userPetList);
+           }
+           else
+           {
+               ShowMessage();
+               NotCorrectDataToUserPetCount(ref userPetCount);
+               AddDataToTheUserPetList(in userPetCount, ref userPetList);
+           }
        }
        
+       static bool CheckDataIsPetAnswer()
+       {
+           string receivedData = CharacterIdentification();
+           if ((receivedData.ToLower() == "yes") || (receivedData.ToLower() == "y"))
+           {
+               return true;
+           }
+           else
+           {
+               if ((receivedData.ToLower() == "no") || (receivedData.ToLower() == "n"))
+               {
+                   return false;
+               }
+               else
+               {
+                   ShowMessage();
+                   return CheckDataIsPetAnswer();
+               }
+           }
+       }
+
+       static void NotCorrectDataToUserPetCount(ref int userPetCount)
+       {
+           userPetCount = CheckNumber(NumberIdentification());
+           while (userPetCount <= 0)
+           {
+               ShowMessage();
+               userPetCount = CheckNumber(NumberIdentification());
+           }
+       }
+
+       static void AddDataToTheUserPetList(in int userPetCount, ref string[] userPetList)
+       {
+           userPetList = new string[userPetCount];
+           for (int i = 1; i < userPetCount; i++)
+           {
+               Console.Write("\t Input you {0} pet name: ", Convert.ToString(i));
+               userPetList[0] = CharacterIdentification();
+           }
+       }
+
+       // Возвращает часть кортежа: количество любимых цветов и их наименование
        static void ColorUserData(ref int userColorCount, ref string[] userColorList)
        {
+           Console.Write("\t How many colors do you like (only numbers)? ");
+           userColorCount = NumberIdentification();
            
+           userColorList = new string[userColorCount];
+           for (int i = 1; i < userColorCount; i++)
+           {
+               Console.Write("\t Input you {0} favorite colors (only letters): ", Convert.ToString(i));
+               userColorList[0] = CharacterIdentification();
+           }
        }
-         
+       
+       // Метод отображает введённую информацию 
        static void ShowUserData(in (string Name, string Surname, int Age, bool isPet, int petCount, string[] petList,
            int colorCount, string[] colorList) userData)
        {
+           Console.WriteLine($"\n\t Hello {userData.Surname} {userData.Name}, yor are {userData.Age} full years old.");
+           
+           if (userData.isPet == true)
+           {
+               Console.WriteLine("\t Yor have a {0} pet.", Convert.ToString(userData.petCount));
+               for (int i = 0; i < userData.petCount; i++)
+               {
+                   Console.WriteLine($"\t {userData.petList[i]}");
+               }
+           }
+           else
+           {
+               Console.WriteLine("\t You don't have any pet's.");
+           }
+
+           if (userData.colorCount == 0)
+           {
+               Console.WriteLine("\t You don't have favorite color.");
+           }
+           else
+           {
+               if (userData.colorCount == 1)
+               {
+                   Console.WriteLine("\t You favorite color is: {0}", userData.colorList[0]);
+               }
+               else
+               {
+                   Console.WriteLine("\t You favorite colors are: ");
+                   for (int i = 1; i < userData.colorCount; i++)
+                   {
+                       Console.WriteLine($"\t\t - {userData.colorList[i]}");
+                   }
+               }
+           }
        } 
     } 
 } 
