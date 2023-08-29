@@ -127,11 +127,14 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
         static void GetPetUserData(ref bool userIsPet, ref int userPetCount, ref string[] userPetList)
         {
             HavePet(ref userIsPet);
-            
-            Console.Write("\t How many pets do you have (only numbers)? ");
-            userPetCount = CheckingNumberPositiveValue(RecognizingNumberInString());
 
-            addPetName(in userPetCount, ref userPetList);
+            if (userIsPet == true)
+            {
+                Console.Write("\t How many pets do you have (only numbers)? ");
+                userPetCount = CheckingNumberPositiveValue(RecognizingNumberInString());
+
+                addPetName(in userPetCount, ref userPetList);
+            }
         }
         
         // Метод проверяет введенный текс по словам сигналам, записывает true/false в переменную userIsPet
@@ -144,16 +147,13 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
             bool isYes = (receivedData.ToLower().Contains("yes") || receivedData.ToLower().Contains("y"));
             bool isNo = (receivedData.ToLower().Contains("no") || receivedData.ToLower().Contains("n"));
 
-            if (isYes == true || isNo == true)
+            if (isYes == true)
             {
-                if (isYes == true || isNo == false)
-                {
-                    userIsPet = isYes;
-                }
-                else
-                {
-                    userIsPet = isNo;
-                }
+                userIsPet = true;
+            }
+            else if (isNo == true)
+            {
+                userIsPet = false;
             }
             else
             {
