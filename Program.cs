@@ -2,48 +2,55 @@
 // Refactoring from: https://github.com/achiss/Unut5_result.git 
 
  
-namespace Unit5.refactoring                                                                                             // Подчёркивается, почему?
+namespace Unit5.refactoring         // Подчёркивается, почему?
 { 
     class Program
     {
+        // Объявление кортежа
         static (string Name, string Surname, int Age, bool isPet, int petCount, string[] petList,
             int colorCount, string[] colorList) userData;
         
+        // Метод "Main" (точка входа)
         static void Main(string[] args)
         {
-           GetUserDataFromConsole(out userData.Name, out userData.Surname, out userData.Age);                           // Пример: out
-           PetUserData(ref userData.isPet, ref userData.petCount, ref userData.petList);                                // Пример: ref
-           ColorUserData(ref userData.colorCount, ref userData.colorList);                                              //
+           GetUserData(out userData.Name, out userData.Surname, out userData.Age);
+           GetPetUserData(ref userData.isPet, ref userData.petCount, ref userData.petList);
+           GetColorUserData(ref userData.colorCount, ref userData.colorList);
            
-           ShowUserData(in userData);                                                                                   // Пример: in
+           ShowUserData(in userData);
            
            Console.ReadKey(); 
         } 
  
+        // Общие методы (методы "получение" данных, проверки) 
         // Получение данных из консоли (проверка: null, пустая строка, строка состоящая из символов разделителей) 
-        static string GetDataFromConsole() 
-        { 
+        static string GetDataFromConsole()
+        {
+            var error = "The data cannot be null.";
+            
             string receivedData = Console.ReadLine(); 
-            if (string.IsNullOrWhiteSpace(receivedData))                                                                //
+            if (string.IsNullOrWhiteSpace(receivedData))
             { 
-                ShowMessage(); 
+                ShowMistakeMessage(error); 
                 return GetDataFromConsole(); 
             } 
- 
+            
             return receivedData; 
         } 
  
         // Проверка полученных данных из консоли (проверка: на цифры и специальные символы) 
-        static string CharacterIdentification() 
-        { 
-            string characterString = GetDataFromConsole(); 
-            bool containSpecialChars = characterString.Any(char.IsLetterOrDigit);                                       // Необходимость текущих строк? 
-            bool containNumbers = characterString.Any(char.IsDigit);                                                    //  
+        static string CharactersToChecked()
+        {
+            var error = "Еhe data cannot contain numbers and special characters.";
             
-           if ((containSpecialChars == false) || (containNumbers == true))                                              // Почему IDE не подсвечивает true? 
+            string characterString = GetDataFromConsole(); 
+            bool containSpecialChars = characterString.Any(char.IsLetterOrDigit);
+            bool containNumbers = characterString.Any(char.IsDigit);
+            
+           if ((containSpecialChars == false) || (containNumbers == true))      // Почему IDE не подсвечивает true? 
             { 
-                ShowMessage(); 
-                return CharacterIdentification(); 
+                ShowMistakeMessage(error); 
+                return CharactersToChecked(); 
             } 
  
             return characterString; 
@@ -51,7 +58,9 @@ namespace Unit5.refactoring                                                     
  
         //  Проверка полученных данных из консоли (проверка: введено число) 
         static int NumberIdentification()
-        { 
+        {
+            var error = "The entered data can be only a number.";
+            
             string receivedData = GetDataFromConsole(); 
             int receivedNumber; 
              
@@ -61,7 +70,7 @@ namespace Unit5.refactoring                                                     
             } 
             else 
             { 
-                ShowMessage(); 
+                ShowMistakeMessage(error); 
                 NumberIdentification(); 
             } 
  
@@ -69,21 +78,23 @@ namespace Unit5.refactoring                                                     
         } 
  
         // Проверка полученных данных из консоли (проверка: введённое число больше 0) 
-        static int CheckNumber(int receivedNumber) 
-        { 
+        static int CheckNumber(int receivedNumber)
+        {
+            var error = "The entered value must be greater than 0.";
+            
             if (receivedNumber < 0) 
             { 
-                ShowMessage(); 
+                ShowMistakeMessage(error); 
                 return NumberIdentification(); 
             } 
-            else                                                                                                        // не выделяет IDE
+            else
             { 
                 if (receivedNumber == 0) 
                 { 
-                    ShowMessage(); 
+                    ShowMistakeMessage(error); 
                     return NumberIdentification(); 
                 } 
-                else                                                                                                    // не выделяет IDE
+                else
                 { 
                     return receivedNumber; 
                 } 
@@ -91,30 +102,48 @@ namespace Unit5.refactoring                                                     
         }
         
         // Метод выводит сообщение об ошибке если введены не корректные значения
-       static void ShowMessage() 
+       static void ShowMistakeMessage(string error) 
         { 
-            Console.WriteLine("\t The data is not correct."); 
-            Console.Write("\t Please, enter the data again: "); 
+            Console.WriteLine("\t [Info] The value you are entering is incorrect!"); 
+            Console.Write("\t [Error] {0} Please, re-enter this data: ", error); 
         }
-
-       static void GetUserDataFromConsole(out string userName, out string userSurname, out int userAge)
+       
+       // Метод получения данных и их сохранение в часть кортежа (личные данные пользователя)
+       static void GetUserData(out string userName, out string userSurname, out int userAge)
         { 
             Console.Write("\n"); 
              
             Console.Write("\t Input your name (only letters): "); 
-            userName = CharacterIdentification(); 
+            userName = CharactersToChecked(); 
              
             Console.Write("\t Input your surname (only letters): "); 
-            userSurname = CharacterIdentification(); 
+            userSurname = CharactersToChecked(); 
              
             Console.Write("\t Input your full agе (only numbers): "); 
             userAge = CheckNumber(NumberIdentification());
         }
        
-       // Метод возвращает часть кортежа: есть ли домашние животные, их количество и кличка(и)
-       // CheckDataIsPetAnswer - проверяет введенное значечение с клавиатуры (userIsPet)
-       // NotCorrectDataToUserPetCount - если в первый раз введено не правильное значение (userPetCount)
-       // AddDataToTheUserPetList - добавляет имена питомцев в массив в соответствии с их количеством.
+        // Метод получения данных и их сохранение в часть кортежа (данные о питомцах)
+        static void GetPetUserData(out bool userIsPet)
+        {
+            Console.Write("\t Do yo have any pet(s) (only letters, Yes(y) or No(n): ");
+            userIsPet = HavePet();
+        }
+        
+        // Метод возвращает булевское значение в переменную userIsPet, есть ли у пользователя питомцы
+        static void HavePet(bool userIsPet)
+        {
+            
+        }
+        
+        
+        
+        
+       
+       
+       
+       
+       
        static void PetUserData(ref bool userIsPet, ref int userPetCount, ref string[] userPetList)
        {
            Console.Write("\t Do yo have any pet(s) (only letters, Yes(y) or No(n): ");
@@ -137,7 +166,7 @@ namespace Unit5.refactoring                                                     
        
        static bool CheckDataIsPetAnswer()
        {
-           string receivedData = CharacterIdentification();
+           string receivedData = CharactersToChecked();
            if ((receivedData.ToLower() == "yes") || (receivedData.ToLower() == "y"))
            {
                return true;
@@ -172,12 +201,16 @@ namespace Unit5.refactoring                                                     
            for (int i = 1; i < userPetCount; i++)
            {
                Console.Write("\t Input you {0} pet name: ", Convert.ToString(i));
-               userPetList[0] = CharacterIdentification();
+               userPetList[0] = CharactersToChecked();
            }
        }
+       
+       
+       
+       
 
        // Возвращает часть кортежа: количество любимых цветов и их наименование
-       static void ColorUserData(ref int userColorCount, ref string[] userColorList)
+       static void GetColorUserData(ref int userColorCount, ref string[] userColorList)
        {
            Console.Write("\t How many colors do you like (only numbers)? ");
            userColorCount = NumberIdentification();
@@ -186,7 +219,7 @@ namespace Unit5.refactoring                                                     
            for (int i = 1; i < userColorCount; i++)
            {
                Console.Write("\t Input you {0} favorite colors (only letters): ", Convert.ToString(i));
-               userColorList[0] = CharacterIdentification();
+               userColorList[0] = CharactersToChecked();
            }
        }
        
