@@ -41,7 +41,7 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
         // Проверка полученных данных из консоли (проверка: на цифры и специальные символы) 
         static string CharactersToChecked()
         {
-            var error = "Еhe data cannot contain numbers and special characters.";
+            var error = "The data cannot contain numbers and special characters.";
             
             string characterString = GetDataFromConsole(); 
             bool containSpecialChars = characterString.Any(char.IsLetterOrDigit);
@@ -57,7 +57,7 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
         } 
  
         //  Проверка полученных данных из консоли (проверка: введено число) 
-        static int NumberIdentification()
+        static int RecognizingNumberInString()
         {
             var error = "The entered data can be only a number.";
             
@@ -71,28 +71,28 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
             else 
             { 
                 ShowMistakeMessage(error); 
-                NumberIdentification(); 
+                RecognizingNumberInString(); 
             } 
  
             return receivedNumber; 
         } 
  
         // Проверка полученных данных из консоли (проверка: введённое число больше 0) 
-        static int CheckNumber(int receivedNumber)
+        static int CheckingNumberPositiveValue(int receivedNumber)
         {
             var error = "The entered value must be greater than 0.";
             
             if (receivedNumber < 0) 
             { 
                 ShowMistakeMessage(error); 
-                return NumberIdentification(); 
+                return RecognizingNumberInString(); 
             } 
             else
             { 
                 if (receivedNumber == 0) 
                 { 
                     ShowMistakeMessage(error); 
-                    return NumberIdentification(); 
+                    return RecognizingNumberInString(); 
                 } 
                 else
                 { 
@@ -120,106 +120,76 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
             userSurname = CharactersToChecked(); 
              
             Console.Write("\t Input your full agе (only numbers): "); 
-            userAge = CheckNumber(NumberIdentification());
+            userAge = CheckingNumberPositiveValue(RecognizingNumberInString());
         }
        
         // Метод получения данных и их сохранение в часть кортежа (данные о питомцах)
-        static void GetPetUserData(out bool userIsPet)
+        static void GetPetUserData(ref bool userIsPet, ref int userPetCount, ref string[] userPetList)
         {
-            Console.Write("\t Do yo have any pet(s) (only letters, Yes(y) or No(n): ");
-            userIsPet = HavePet();
-        }
-        
-        // Метод возвращает булевское значение в переменную userIsPet, есть ли у пользователя питомцы
-        static void HavePet(bool userIsPet)
-        {
+            HavePet(ref userIsPet);
             
+            Console.Write("\t How many pets do you have (only numbers)? ");
+            userPetCount = CheckingNumberPositiveValue(RecognizingNumberInString());
+
+            addPetName(in userPetCount, ref userPetList);
         }
         
-        
-        
-        
-       
-       
-       
-       
-       
-       static void PetUserData(ref bool userIsPet, ref int userPetCount, ref string[] userPetList)
-       {
-           Console.Write("\t Do yo have any pet(s) (only letters, Yes(y) or No(n): ");
-           userIsPet = CheckDataIsPetAnswer();
-           
-           if (userIsPet == true)
-           {
-               Console.Write("\t Input, how many pet's do you have (only numbers)?");
-               userPetCount = CheckNumber(NumberIdentification());
-               
-               AddDataToTheUserPetList(in userPetCount, ref userPetList);
-           }
-           else
-           {
-               ShowMessage();
-               NotCorrectDataToUserPetCount(ref userPetCount);
-               AddDataToTheUserPetList(in userPetCount, ref userPetList);
-           }
-       }
-       
-       static bool CheckDataIsPetAnswer()
-       {
-           string receivedData = CharactersToChecked();
-           if ((receivedData.ToLower() == "yes") || (receivedData.ToLower() == "y"))
-           {
-               return true;
-           }
-           else
-           {
-               if ((receivedData.ToLower() == "no") || (receivedData.ToLower() == "n"))
-               {
-                   return false;
-               }
-               else
-               {
-                   ShowMessage();
-                   return CheckDataIsPetAnswer();
-               }
-           }
-       }
+        // Метод проверяет введенный текс по словам сигналам, записывает true/false в переменную userIsPet
+        static void HavePet(ref bool userIsPet)
+        {
+            var error = "Type YES or NO.";
 
-       static void NotCorrectDataToUserPetCount(ref int userPetCount)
-       {
-           userPetCount = CheckNumber(NumberIdentification());
-           while (userPetCount <= 0)
-           {
-               ShowMessage();
-               userPetCount = CheckNumber(NumberIdentification());
-           }
-       }
+            Console.Write("\t Do yo have any pet(s) (only letters, Yes(y) or No(n): ");
+            string receivedData = CharactersToChecked();
+            bool isYes = (receivedData.ToLower().Contains("yes") || receivedData.ToLower().Contains("y"));
+            bool isNo = (receivedData.ToLower().Contains("no") || receivedData.ToLower().Contains("n"));
 
-       static void AddDataToTheUserPetList(in int userPetCount, ref string[] userPetList)
-       {
-           userPetList = new string[userPetCount];
-           for (int i = 1; i < userPetCount; i++)
-           {
-               Console.Write("\t Input you {0} pet name: ", Convert.ToString(i));
-               userPetList[0] = CharactersToChecked();
-           }
-       }
-       
-       
-       
-       
+            if (isYes == true || isNo == true)
+            {
+                if (isYes == true || isNo == false)
+                {
+                    userIsPet = isYes;
+                }
+                else
+                {
+                    userIsPet = isNo;
+                }
+            }
+            else
+            {
+                ShowMistakeMessage(error);
+            }
+        }
 
-       // Возвращает часть кортежа: количество любимых цветов и их наименование
+        // Метод добавляет кличики животных в массив
+        static void addPetName(in int userPetCount, ref string[] userPetList)
+        {
+            int count = 1;
+            
+            userPetList = new string[userPetCount];
+            for (int i = 0; i < userPetCount; i++)
+            {
+                Console.Write("\t Input you {0} pet name: ", count);
+                userPetList[i] = CharactersToChecked();
+
+                count++;
+            }
+        }
+        
+        // Возвращает часть кортежа: количество любимых цветов и их наименование
        static void GetColorUserData(ref int userColorCount, ref string[] userColorList)
        {
            Console.Write("\t How many colors do you like (only numbers)? ");
-           userColorCount = NumberIdentification();
-           
+           userColorCount = CheckingNumberPositiveValue(RecognizingNumberInString());
+
+           int count = 1;
            userColorList = new string[userColorCount];
-           for (int i = 1; i < userColorCount; i++)
+           for (int i = 0; i < userColorCount; i++)
            {
-               Console.Write("\t Input you {0} favorite colors (only letters): ", Convert.ToString(i));
-               userColorList[0] = CharactersToChecked();
+               Console.Write("\t Input you {0} favorite colors (only letters): ", count);
+               userColorList[i] = CharactersToChecked();
+
+               count++;
            }
        }
        
@@ -234,7 +204,7 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
                Console.WriteLine("\t Yor have a {0} pet.", Convert.ToString(userData.petCount));
                for (int i = 0; i < userData.petCount; i++)
                {
-                   Console.WriteLine($"\t {userData.petList[i]}");
+                   Console.WriteLine($"\t\t - {userData.petList[i]}");
                }
            }
            else
@@ -255,7 +225,7 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
                else
                {
                    Console.WriteLine("\t You favorite colors are: ");
-                   for (int i = 1; i < userData.colorCount; i++)
+                   for (int i = 0; i < userData.colorCount; i++)
                    {
                        Console.WriteLine($"\t\t - {userData.colorList[i]}");
                    }
