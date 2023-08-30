@@ -2,22 +2,22 @@
 // Refactoring from: https://github.com/achiss/Unut5_result.git 
 
  
-namespace Unit5.refactoring         // Подчёркивается, почему?
+namespace EDU.SkillFactory.Unit5.VW
 { 
     class Program
     {
         // Объявление кортежа
-        static (string Name, string Surname, int Age, bool isPet, int petCount, string[] petList,
-            int colorCount, string[] colorList) userData;
+        static private (string Name, string Surname, int Age, bool isPet, int petCount, string[] petList,
+            int colorCount, string[] colorList) _userData;
         
         // Метод "Main" (точка входа)
         static void Main(string[] args)
         {
-           GetUserData(out userData.Name, out userData.Surname, out userData.Age);
-           GetPetUserData(ref userData.isPet, ref userData.petCount, ref userData.petList);
-           GetColorUserData(ref userData.colorCount, ref userData.colorList);
+           GetUserData(out _userData.Name, out _userData.Surname, out _userData.Age);
+           GetPetUserData(ref _userData.isPet, ref _userData.petCount, ref _userData.petList);
+           GetColorUserData(ref _userData.colorCount, ref _userData.colorList);
            
-           ShowUserData(in userData);
+           ShowUserData(in _userData);
            
            Console.ReadKey(); 
         } 
@@ -47,7 +47,7 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
             bool containSpecialChars = characterString.Any(char.IsLetterOrDigit);
             bool containNumbers = characterString.Any(char.IsDigit);
             
-           if ((containSpecialChars == false) || (containNumbers == true))      // Почему IDE не подсвечивает true? 
+           if (containSpecialChars == false || containNumbers)      // Почему IDE не подсвечивает true? 
             { 
                 ShowMistakeMessage(error); 
                 return CharactersToChecked(); 
@@ -81,24 +81,14 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
         static int CheckingNumberPositiveValue(int receivedNumber)
         {
             var error = "The entered value must be greater than 0.";
+
+            while (receivedNumber <= 0)
+            {
+                ShowMistakeMessage(error);
+                return RecognizingNumberInString();
+            }
             
-            if (receivedNumber < 0) 
-            { 
-                ShowMistakeMessage(error); 
-                return RecognizingNumberInString(); 
-            } 
-            else
-            { 
-                if (receivedNumber == 0) 
-                { 
-                    ShowMistakeMessage(error); 
-                    return RecognizingNumberInString(); 
-                } 
-                else
-                { 
-                    return receivedNumber; 
-                } 
-            } 
+            return receivedNumber; 
         }
         
         // Метод выводит сообщение об ошибке если введены не корректные значения
@@ -128,7 +118,7 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
         {
             HavePet(ref userIsPet);
 
-            if (userIsPet == true)
+            if (userIsPet)
             {
                 Console.Write("\t How many pets do you have (only numbers)? ");
                 userPetCount = CheckingNumberPositiveValue(RecognizingNumberInString());
@@ -147,11 +137,11 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
             bool isYes = (receivedData.ToLower().Contains("yes") || receivedData.ToLower().Contains("y"));
             bool isNo = (receivedData.ToLower().Contains("no") || receivedData.ToLower().Contains("n"));
 
-            if (isYes == true)
+            if (isYes)
             {
                 userIsPet = true;
             }
-            else if (isNo == true)
+            else if (isNo)
             {
                 userIsPet = false;
             }
@@ -199,7 +189,7 @@ namespace Unit5.refactoring         // Подчёркивается, почем�
        {
            Console.WriteLine($"\n\t Hello {userData.Surname} {userData.Name}, yor are {userData.Age} full years old.");
            
-           if (userData.isPet == true)
+           if (userData.isPet)
            {
                Console.WriteLine("\t Yor have a {0} pet.", Convert.ToString(userData.petCount));
                for (int i = 0; i < userData.petCount; i++)
